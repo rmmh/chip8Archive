@@ -2376,5 +2376,33 @@
             "logicQuirks": 1,
             "fontStyle": "octo"
         }
-    }
+    },
+	"tick": {
+		"title": "Tick",
+		"authors": ["StanislavDidus"],
+		"images": ["recording.gif"],
+		"desc": "Rhythm one button game for Chip-8",
+		"release": "2026-08-11",
+		"platform": "chip8",
+		"options": {
+			"tickrate": 12,
+            "backgroundColor": "#1E1E1E",
+            "fillColor": "#7BFF00",
+            "fillColor2": "#000000",
+            "blendColor": "#000000",
+            "buzzColor": "#000000",
+            "quietColor": "#000000",
+            "shiftQuirks": 0,
+            "loadStoreQuirks": 0,
+            "vfOrderQuirks": false,
+            "clipQuirks": 0,
+            "vBlankQuirks": 0,
+            "jumpQuirks": 0,
+            "screenRotation": 0,
+            "maxSize": 3232,
+            "touchInputMode": "none",
+            "logicQuirks": 1,
+            "fontStyle": "octo"
+		}
+	}
 }
