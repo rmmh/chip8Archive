@@ -1,0 +1,308 @@
+# Mato8
+# By nortti, 2023 (Octo conversion 2026)
+# Snake game for CHIP-8
+# Under Creative Commons Zero 1.0
+# Assemble with octo-cli (https://github.com/JohnEarnest/c-octo)
+
+:const frames_wait 5
+
+:const up_key 2
+:const down_key 8
+:const left_key 4
+:const right_key 6
+
+:const direction_up 0
+:const direction_down 6
+:const direction_left 12
+:const direction_right 18
+
+:alias score_high_reg v5
+:alias score_low_reg v6
+:alias game_over_reg v7
+:alias fruit_x_reg v8
+:alias fruit_y_reg v9
+:alias tail_x_reg va
+:alias tail_y_reg vb
+:alias head_direction_reg vc
+:alias head_x_reg vd
+:alias head_y_reg ve
+
+: main
+	clear
+	game_over_reg := 0
+
+	score_high_reg := 0
+	score_low_reg := 0
+
+	head_x_reg := random 63
+	head_y_reg := random 31
+
+	tail_x_reg := head_x_reg
+	tail_y_reg := head_y_reg
+
+	head_direction_reg := direction_right
+
+	i := single_pixel
+	sprite head_x_reg head_y_reg 1
+
+	spawn_fruit
+
+: mainloop
+	v0 := frames_wait
+	delay := v0
+
+	v1 := head_direction_reg
+
+	v0 := up_key
+	if v0 key then turn_up
+
+	v0 := down_key
+	if v0 key then turn_down
+
+	v0 := left_key
+	if v0 key then turn_left
+
+	v0 := right_key
+	if v0 key then turn_right
+
+	move_snake
+
+	# Wait until the frame timer hits zero
+	loop
+		vf := delay
+		if vf != 0 then
+	again
+
+	if game_over_reg == 0 then jump mainloop
+
+: game_over
+	v0 := 20
+	buzzer := v0
+	wait
+
+	display_score
+
+	v0 := 30
+	wait
+
+	v0 := 20
+	buzzer := v0
+	wait
+
+	v0 := 30
+	wait
+
+	v0 := 20
+	buzzer := v0
+	wait
+
+	jump main
+
+: display_score
+	clear
+
+	i := score_high_bcd
+	bcd score_high_reg
+	i := score_low_bcd
+	bcd score_low_reg
+
+	i := score_low_bcd
+	load v2
+	# v0 and v1 are zero, v2 is ones
+	v3 := v2
+	i := score_high_bcd
+	load v2
+	# v0 is thousands, v1 is hundreds, v2 is tens
+
+	# Score is a four-digit number stored in v0 to v3
+	v4 := 0
+	v5 := 0
+	i := hex v0
+	sprite v4 v5 5
+
+	v4 += 5
+	i := hex v1
+	sprite v4 v5 5
+
+	v4 += 5
+	i := hex v2
+	sprite v4 v5 5
+
+	v4 += 5
+	i := hex v3
+	sprite v4 v5 5
+
+;
+
+: wait
+	delay := v0
+	loop
+		vf := delay
+		if vf != 0 then
+	again
+;
+
+: spawn_fruit
+	loop
+		fruit_x_reg := random 63
+		fruit_y_reg := random 31
+
+		i := single_pixel
+		sprite fruit_x_reg fruit_y_reg 1
+
+		# Did we spawn succesfully?
+		if vf == 0 then return
+
+		# No, we spawned over the snake. Erase and try again
+		i := single_pixel
+		sprite fruit_x_reg fruit_y_reg 1
+	again
+
+# Don't allow 180° turns (which would kill the snake instantly)
+: turn_up if v1 != direction_down then head_direction_reg := direction_up ;
+: turn_down if v1 != direction_up then head_direction_reg := direction_down ;
+: turn_left if v1 != direction_right then head_direction_reg := direction_left ;
+: turn_right if v1 != direction_left then head_direction_reg := direction_right ;
+
+: move_snake
+	# Save the direction the snake is moving at head's location
+	v0 := head_x_reg
+	v1 := head_y_reg
+	direction_table_index
+	v0 := head_direction_reg
+	save v0
+
+	# Move the snake's head
+	unpack_direction
+	head_x_reg += v0
+	v0 := 63
+	head_x_reg &= v0
+	head_y_reg += v1
+	v0 := 31
+	head_y_reg &= v0
+
+	# Draw head location and erase tail location
+	i := single_pixel
+	sprite head_x_reg head_y_reg 1
+	if vf != 0 then jump collision
+	sprite tail_x_reg tail_y_reg 1
+
+	# Load the direction the snake was moving at tail's location
+	v0 := tail_x_reg
+	v1 := tail_y_reg
+	direction_table_index
+	load v0
+
+	# Move the snake's tail
+	unpack_direction
+	tail_x_reg += v0
+	v0 := 63
+	tail_x_reg &= v0
+	tail_y_reg += v1
+	v0 := 31
+	tail_y_reg &= v0
+;
+
+: direction_table_index
+	# v0 is the X coördinate, from 0 to 63, 00xxxxxx
+	# v1 is the Y coördinate, from 0 to 31, 000yyyyy
+	v0 <<= v0
+	v0 <<= v0
+	# v0 is the X coördinate shifted left by two, xxxxxx00
+	v2 := 0b11100000
+	v2 &= v0
+	v1 |= v2
+	# v1 is combination of high 3 bits of X coördinate and the Y coördinate, xxxyyyyy
+	v2 := 0b00011100
+	v0 &= v2
+	# v0 is the low 3 bits of the X coördinate shifted left by two, 000xxx00
+
+	jump0 direction_table_index_table
+	: direction_table_index_table
+		# 0
+		i := 0x400
+		jump direction_table_index_end
+
+		# 1
+		i := 0x500
+		jump direction_table_index_end
+
+		# 2
+		i := 0x600
+		jump direction_table_index_end
+
+		# 3
+		i := 0x700
+		jump direction_table_index_end
+
+		# 4
+		i := 0x800
+		jump direction_table_index_end
+
+		# 5
+		i := 0x900
+		jump direction_table_index_end
+
+		# 6
+		i := 0xa00
+		jump direction_table_index_end
+
+		# 7
+		i := 0xb00
+
+	: direction_table_index_end
+	i += v1
+;
+
+: unpack_direction
+	jump0 unpack_direction_table
+	: unpack_direction_table
+		# Up
+		v0 := 0
+		v1 := 0xff
+		return
+
+		# Down
+		v0 := 0
+		v1 := 1
+		return
+
+		# Left
+		v0 := 0xff
+		v1 := 0
+		return
+
+		# Right
+		v0 := 1
+		v1 := 0
+;
+
+: collision
+	if head_x_reg != fruit_x_reg then jump tail_collision
+	if head_y_reg != fruit_y_reg then jump tail_collision
+
+: eat_fruit
+	# Jumping to collision skips tail moving code, so we get the snake
+	# lengthening for free
+	increment_score
+
+	v0 := 1
+	buzzer := v0
+
+	i := single_pixel
+	sprite fruit_x_reg fruit_y_reg 1
+	jump spawn_fruit
+
+: increment_score
+	# Low register stores 0…9
+	score_low_reg += 1
+	if score_low_reg != 10 then return
+	score_low_reg := 0
+	score_high_reg += 1
+;
+
+: tail_collision game_over_reg := 1 ;
+
+: single_pixel :byte 0x80
+: score_high_bcd :byte 0 0 0
+: score_low_bcd :byte 0 0 0

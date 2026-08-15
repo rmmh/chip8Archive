@@ -2404,5 +2404,14 @@
             "logicQuirks": 1,
             "fontStyle": "octo"
 		}
+	},
+	"mato8": {
+		"title": "Mato8",
+		"athors": ["nortti"],
+		"images": ["itch-image.png"],
+		"desc": "Snake game (matopeli in Finnish)",
+		"event": "GAMES MADE QVIICK???",
+		"release": "2023-01-14",
+		"platform": "chip8"
 	}
 }
