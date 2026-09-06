@@ -2407,7 +2407,7 @@
 	},
 	"mato8": {
 		"title": "Mato8",
-		"athors": ["nortti"],
+		"authors": ["nortti"],
 		"images": ["itch-image.png"],
 		"desc": "Snake game (matopeli in Finnish)",
 		"event": "GAMES MADE QVIICK???",
