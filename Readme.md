@@ -2,7 +2,7 @@ Chip8 Community Archive
 =======================
 Since 1977 the [Chip8](https://en.wikipedia.org/wiki/CHIP-8) platform has provided an outlet for programming creativity. The [Octo](http://octo-ide.com) toolchain makes it easier than ever to get started, and has lead to the creation of a wide variety of fun and interesting software. This repository is meant to serve as a stable archive of Chip8 programs along with their metadata, with attribution, supporting material, and clear licensing.
 
-Check out the [Online Gallery](https://johnearnest.github.io/chip8Archive/) of submitted programs!
+Check out the [Online Gallery](https://beyondloom.com/octo/archive.html) of submitted programs!
 
 More Chip8 Software Elsewhere
 -----------------------------
@@ -38,17 +38,9 @@ If you are recording animated GIFs of a game with Octo, be sure to run the outpu
 
 	gifsicle src/mygame/cool.gif --optimize=3 --colors=2 -o src/mygame/cool.gif
 
-Old shared Octo programs used GitHub gists to store their source and metadata. If you have a URL which looks like
+Octo's sharing system uses a custom storage API, and URLs look like this:
 
-	http://johnearnest.github.io/Octo/index.html?gist=bdd2840b9fe5fad7bd5995423ea57a23
-
-You can use the gist ID to view the `options` dictionary and original submission date:
-
-	https://gist.github.com/bdd2840b9fe5fad7bd5995423ea57a23
-
-Octo's newer sharing system uses a custom storage API, and URLs look like this:
-
-	http://johnearnest.github.io/Octo/index.html?key=AcfYNFAu
+	http://beyondloom.com/octo/ide.html?key=AcfYNFAu
 
 The `key` can be used to retrieve a JSON file with `options` and other metadata like this:
 
@@ -70,6 +62,6 @@ Chip8 software, like most console homebrew, tends to exist in a murky gray area 
 
 Contributing
 ------------
-Anyone who has developed Chip8 software is encouraged to submit a pull request containing new entries in the author and program registries, a new Chip8 rom, and other materials as desired. Submitting a pull request indicates that you're willing to adhere to the licensing agreement as indicated above. _Please do not submit programs which are not yours to license!_ If you are considering contributing but are unhappy with CC0 licensing, feel free to contact me (John Earnest) and see if we can work something out.
+Anyone who has developed Chip8 software is encouraged to submit a pull request containing new entries in the author and program registries, a new Chip8 rom, and other materials as desired. Submitting a pull request indicates that you're willing to adhere to the licensing agreement as indicated above. _Please do not submit programs which are not yours to license!_
 
 Programs which were not created with Octo are perfectly welcome in this archive. For the sake of consistency in future emulation we do ask that you test your programs using Octo and determine the necessary adjustments to its "quirks flags" when preparing your metadata entries. The Octo project captures extensive research and testing with historical software and can accurately reproduce most of the variation between Chip8 interpreters in the wild today, with the notable exception (for now) of support for RCA 1802 machinecode.
